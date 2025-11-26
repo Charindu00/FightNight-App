@@ -2,11 +2,13 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
-import { theme } from '../styles/theme';
+import { useTheme } from '../context/ThemeContext';
 
 const Stack = createNativeStackNavigator();
 
 export default function AuthStack() {
+  const { theme } = useTheme();
+  
   return (
     <Stack.Navigator
       screenOptions={{
@@ -15,7 +17,7 @@ export default function AuthStack() {
         },
         headerTintColor: theme.colors.primary,
         headerTitleStyle: {
-          fontWeight: theme.fontWeight.bold,
+          fontWeight: '700',
         },
         headerShadowVisible: false,
         contentStyle: {

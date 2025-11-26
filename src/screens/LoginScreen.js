@@ -8,35 +8,57 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { login } from '../redux/slices/authSlice';
-import { theme } from '../styles/theme';
+import { loginUser } from '../services/api';
+import { useTheme, themes, sharedTheme } from '../context/ThemeContext';
+
+// Static theme for StyleSheet (uses dark theme as base)
+const staticTheme = { ...themes.dark, ...sharedTheme };
 
 export default function LoginScreen({ navigation }) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const { theme } = useTheme();
+  const [username, setUsername] = useState('emilys'); // Pre-filled for testing
+  const [password, setPassword] = useState('emilyspass'); // Pre-filled for testing
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     // Validation
     if (!username.trim() || !password.trim()) {
       Alert.alert('Error', 'Please enter both username and password');
       return;
     }
 
-    // Simulate login (we'll connect to API later)
-    const userData = {
-      user: {
-        id: '1',
-        name: username,
-        email: `${username}@fightnight.com`,
-      },
-      token: 'dummy-token-12345',
-    };
+    setLoading(true);
+    
+    try {
+      // Call dummyjson login API
+      const userData = await loginUser(username, password);
+      
+      // Transform response to match our app structure
+      const authData = {
+        user: {
+          id: userData.id.toString(),
+          name: `${userData.firstName} ${userData.lastName}`,
+          email: userData.email,
+          username: userData.username,
+          image: userData.image,
+        },
+        token: userData.token,
+      };
 
-    // Dispatch login action
-    dispatch(login(userData));
+      // Dispatch login action
+      dispatch(login(authData));
+      Alert.alert('Success', `Welcome back, ${userData.firstName}!`);
+    } catch (error) {
+      Alert.alert('Login Failed', 'Invalid credentials. Try: emilys / emilyspass');
+      console.error('Login error:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -72,9 +94,22 @@ export default function LoginScreen({ navigation }) {
           />
 
           {/* Login Button */}
-          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-            <Text style={styles.loginButtonText}>Login</Text>
+          <TouchableOpacity 
+            style={[styles.loginButton, loading && styles.loginButtonDisabled]} 
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.loginButtonText}>Login</Text>
+            )}
           </TouchableOpacity>
+
+          {/* Helper Text */}
+          <Text style={styles.helperText}>
+            Test credentials: emilys / emilyspass
+          </Text>
 
           {/* Register Link */}
           <TouchableOpacity
@@ -95,61 +130,71 @@ export default function LoginScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: staticTheme.colors.background,
   },
   content: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: theme.spacing.lg,
+    paddingHorizontal: staticTheme.spacing.lg,
   },
   title: {
-    fontSize: theme.fontSize.xxl,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.primary,
+    fontSize: staticTheme.fontSize.xxl,
+    fontWeight: staticTheme.fontWeight.bold,
+    color: staticTheme.colors.primary,
     textAlign: 'center',
-    marginBottom: theme.spacing.sm,
+    marginBottom: staticTheme.spacing.sm,
   },
   subtitle: {
-    fontSize: theme.fontSize.lg,
-    color: theme.colors.accent,
+    fontSize: staticTheme.fontSize.lg,
+    color: staticTheme.colors.accent,
     textAlign: 'center',
-    marginBottom: theme.spacing.xl,
+    marginBottom: staticTheme.spacing.xl,
   },
   formContainer: {
     width: '100%',
   },
   input: {
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.borderRadius.md,
-    padding: theme.spacing.md,
-    fontSize: theme.fontSize.md,
-    color: theme.colors.text,
-    marginBottom: theme.spacing.md,
+    backgroundColor: staticTheme.colors.card,
+    borderRadius: staticTheme.borderRadius.md,
+    padding: staticTheme.spacing.md,
+    fontSize: staticTheme.fontSize.md,
+    color: staticTheme.colors.text,
+    marginBottom: staticTheme.spacing.md,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: staticTheme.colors.border,
   },
   loginButton: {
-    backgroundColor: theme.colors.primary,
-    borderRadius: theme.borderRadius.md,
-    padding: theme.spacing.md,
+    backgroundColor: staticTheme.colors.primary,
+    borderRadius: staticTheme.borderRadius.md,
+    padding: staticTheme.spacing.md,
     alignItems: 'center',
-    marginTop: theme.spacing.md,
+    marginTop: staticTheme.spacing.md,
+  },
+  loginButtonDisabled: {
+    opacity: 0.6,
   },
   loginButtonText: {
-    color: theme.colors.text,
-    fontSize: theme.fontSize.lg,
-    fontWeight: theme.fontWeight.bold,
+    color: staticTheme.colors.text,
+    fontSize: staticTheme.fontSize.lg,
+    fontWeight: staticTheme.fontWeight.bold,
+  },
+  helperText: {
+    color: staticTheme.colors.textSecondary,
+    fontSize: staticTheme.fontSize.sm,
+    textAlign: 'center',
+    marginTop: staticTheme.spacing.sm,
+    fontStyle: 'italic',
   },
   registerLink: {
-    marginTop: theme.spacing.lg,
+    marginTop: staticTheme.spacing.lg,
     alignItems: 'center',
   },
   registerText: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.fontSize.md,
+    color: staticTheme.colors.textSecondary,
+    fontSize: staticTheme.fontSize.md,
   },
   registerTextBold: {
-    color: theme.colors.accent,
-    fontWeight: theme.fontWeight.bold,
+    color: staticTheme.colors.accent,
+    fontWeight: staticTheme.fontWeight.bold,
   },
 });

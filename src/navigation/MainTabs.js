@@ -8,14 +8,18 @@ import { logout, selectUser } from '../redux/slices/authSlice';
 
 import HomeScreen from '../screens/HomeScreen';
 import FavouritesScreen from '../screens/FavouritesScreen';
+import SearchScreen from '../screens/SearchScreen';
+import FighterProfileScreen from '../screens/FighterProfileScreen';
 import DetailsScreen from '../screens/DetailsScreen';
-import { theme } from '../styles/theme';
+import { useTheme } from '../context/ThemeContext';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 // Stack for Home tab (includes Details screen)
 function HomeStack() {
+  const { theme } = useTheme();
+  
   return (
     <Stack.Navigator
       screenOptions={{
@@ -24,7 +28,7 @@ function HomeStack() {
         },
         headerTintColor: theme.colors.text,
         headerTitleStyle: {
-          fontWeight: theme.fontWeight.bold,
+          fontWeight: '700',
         },
         headerShadowVisible: false,
         contentStyle: {
@@ -51,6 +55,8 @@ function HomeStack() {
 
 // Stack for Favourites tab (includes Details screen)
 function FavouritesStack() {
+  const { theme } = useTheme();
+  
   return (
     <Stack.Navigator
       screenOptions={{
@@ -59,7 +65,7 @@ function FavouritesStack() {
         },
         headerTintColor: theme.colors.text,
         headerTitleStyle: {
-          fontWeight: theme.fontWeight.bold,
+          fontWeight: '700',
         },
         headerShadowVisible: false,
         contentStyle: {
@@ -84,9 +90,55 @@ function FavouritesStack() {
   );
 }
 
+// Stack for Search tab (includes Details screen)
+function SearchStack() {
+  const { theme } = useTheme();
+  
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: theme.colors.background,
+        },
+        headerTintColor: theme.colors.text,
+        headerTitleStyle: {
+          fontWeight: '700',
+        },
+        headerShadowVisible: false,
+        contentStyle: {
+          backgroundColor: theme.colors.background,
+        },
+      }}
+    >
+      <Stack.Screen
+        name="SearchMain"
+        component={SearchScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="FighterProfile"
+        component={FighterProfileScreen}
+        options={{
+          title: 'Fighter Profile',
+          headerBackTitle: 'Back',
+        }}
+      />
+      <Stack.Screen
+        name="Details"
+        component={DetailsScreen}
+        options={{
+          title: 'Fight Details',
+          headerBackTitle: 'Back',
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
+
 export default function MainTabs() {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
+  const { theme } = useTheme();
 
   const handleLogout = () => {
     dispatch(logout());
@@ -100,6 +152,8 @@ export default function MainTabs() {
 
           if (route.name === 'Home') {
             iconName = 'home';
+          } else if (route.name === 'Search') {
+            iconName = 'search';
           } else if (route.name === 'Favourites') {
             iconName = focused ? 'heart' : 'heart';
           }
@@ -117,15 +171,15 @@ export default function MainTabs() {
           height: 60,
         },
         tabBarLabelStyle: {
-          fontSize: theme.fontSize.xs,
-          fontWeight: theme.fontWeight.medium,
+          fontSize: 12,
+          fontWeight: '500',
         },
         headerStyle: {
           backgroundColor: theme.colors.background,
         },
         headerTintColor: theme.colors.text,
         headerTitleStyle: {
-          fontWeight: theme.fontWeight.bold,
+          fontWeight: '700',
         },
         headerShadowVisible: false,
       })}
@@ -144,6 +198,21 @@ export default function MainTabs() {
             </TouchableOpacity>
           ),
           headerTitle: user ? `Welcome, ${user.name}! 🥊` : 'FightNight',
+        }}
+      />
+      <Tab.Screen
+        name="Search"
+        component={SearchStack}
+        options={{
+          title: 'Search',
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={handleLogout}
+              style={{ marginRight: 15 }}
+            >
+              <Feather name="log-out" size={24} color={theme.colors.primary} />
+            </TouchableOpacity>
+          ),
         }}
       />
       <Tab.Screen

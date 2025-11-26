@@ -9,9 +9,13 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import { theme } from '../styles/theme';
+import { useTheme, themes, sharedTheme } from '../context/ThemeContext';
+
+// Static theme for StyleSheet (uses dark theme as base)
+const staticTheme = { ...themes.dark, ...sharedTheme };
 
 export default function RegisterScreen({ navigation }) {
+  const { theme } = useTheme();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -102,61 +106,61 @@ export default function RegisterScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: staticTheme.colors.background,
   },
   content: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: theme.spacing.lg,
+    paddingHorizontal: staticTheme.spacing.lg,
   },
   title: {
-    fontSize: theme.fontSize.xxl,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.primary,
+    fontSize: staticTheme.fontSize.xxl,
+    fontWeight: staticTheme.fontWeight.bold,
+    color: staticTheme.colors.primary,
     textAlign: 'center',
-    marginBottom: theme.spacing.sm,
+    marginBottom: staticTheme.spacing.sm,
   },
   subtitle: {
-    fontSize: theme.fontSize.lg,
-    color: theme.colors.accent,
+    fontSize: staticTheme.fontSize.lg,
+    color: staticTheme.colors.accent,
     textAlign: 'center',
-    marginBottom: theme.spacing.xl,
+    marginBottom: staticTheme.spacing.xl,
   },
   formContainer: {
     width: '100%',
   },
   input: {
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.borderRadius.md,
-    padding: theme.spacing.md,
-    fontSize: theme.fontSize.md,
-    color: theme.colors.text,
-    marginBottom: theme.spacing.md,
+    backgroundColor: staticTheme.colors.card,
+    borderRadius: staticTheme.borderRadius.md,
+    padding: staticTheme.spacing.md,
+    fontSize: staticTheme.fontSize.md,
+    color: staticTheme.colors.text,
+    marginBottom: staticTheme.spacing.md,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: staticTheme.colors.border,
   },
   registerButton: {
-    backgroundColor: theme.colors.primary,
-    borderRadius: theme.borderRadius.md,
-    padding: theme.spacing.md,
+    backgroundColor: staticTheme.colors.primary,
+    borderRadius: staticTheme.borderRadius.md,
+    padding: staticTheme.spacing.md,
     alignItems: 'center',
-    marginTop: theme.spacing.md,
+    marginTop: staticTheme.spacing.md,
   },
   registerButtonText: {
-    color: theme.colors.text,
-    fontSize: theme.fontSize.lg,
-    fontWeight: theme.fontWeight.bold,
+    color: staticTheme.colors.text,
+    fontSize: staticTheme.fontSize.lg,
+    fontWeight: staticTheme.fontWeight.bold,
   },
   loginLink: {
-    marginTop: theme.spacing.lg,
+    marginTop: staticTheme.spacing.lg,
     alignItems: 'center',
   },
   loginText: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.fontSize.md,
+    color: staticTheme.colors.textSecondary,
+    fontSize: staticTheme.fontSize.md,
   },
   loginTextBold: {
-    color: theme.colors.accent,
-    fontWeight: theme.fontWeight.bold,
+    color: staticTheme.colors.accent,
+    fontWeight: staticTheme.fontWeight.bold,
   },
 });
